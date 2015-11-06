@@ -229,22 +229,21 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
-function TR_Callback(hObject, eventdata, handles)
-% hObject    handle to TR (see GCBO)
+function TR2_Callback(hObject, eventdata, handles)
+% hObject    handle to TR2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of TR as text
-%        str2double(get(hObject,'String')) returns contents of TR as a double
+% Hints: get(hObject,'String') returns contents of TR2 as text
+%        str2double(get(hObject,'String')) returns contents of TR2 as a double
 TR = str2double(get(hObject, 'String'));
 TR = max(1, TR); 
 set(hObject, 'String', num2str(TR));
 
 
 % --- Executes during object creation, after setting all properties.
-function TR_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to TR (see GCBO)
+function TR2_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to TR2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -253,7 +252,6 @@ function TR_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 
 function DA_Callback(hObject, eventdata, handles)
@@ -430,25 +428,3 @@ function saveToAppData(handles)
 %to transfer to other figures
 inputs = readInputs(handles);
 setappdata(0, 'inputs', inputs);
-
-
-function TR2_Callback(hObject, eventdata, handles)
-% hObject    handle to TR2 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of TR2 as text
-%        str2double(get(hObject,'String')) returns contents of TR2 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function TR2_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to TR2 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
