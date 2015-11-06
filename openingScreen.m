@@ -22,7 +22,7 @@ function varargout = openingScreen(varargin)
 
 % Edit the above text to modify the response to help openingScreen
 
-% Last Modified by GUIDE v2.5 06-Nov-2015 11:14:54
+% Last Modified by GUIDE v2.5 06-Nov-2015 15:56:18
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -51,6 +51,39 @@ function openingScreen_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to openingScreen (see VARARGIN)
+global latestFile dataFolder;
+
+[folder, ~, ~] = fileparts(mfilename('fullpath'));
+if isdeployed
+    folder = pwd;
+end
+
+dataFolder = fullfile(folder, 'UserData');
+if ~exist(dataFolder, 'dir')
+    mkdir(dataFolder);
+end
+
+latestFile = fullfile(dataFolder, 'latest.txt');
+if ~exist(latestFile, 'file')
+    fid = fopen(latestFile, 'wt+');
+    fclose(fid);
+end
+
+%Read the latest test input file, if available
+fid = fopen(latestFile, 'r');
+latestTestParamsFile = fgetl(fid);
+fclose(fid);
+
+%Load the test inputs, if possible
+if ischar(latestTestParamsFile)
+    %There is latest file path
+    %Load it
+    inputs = loadTestParamsFromFile(latestTestParamsFile);
+    
+    if ~isempty(inputs)
+        loadInputs(handles, inputs);
+    end
+end
 
 % Choose default command line output for openingScreen
 handles.output = hObject;
@@ -294,6 +327,11 @@ function saveButton_Callback(hObject, eventdata, handles)
 % hObject    handle to saveButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+global dataFolder;
+inputs = readInputs(handles);
+fileName = saveTestParamsToFile(dataFolder, inputs);
+msg = sprintf('File saved to:\n%s!', fileName);
+msgbox(msg);
 
 
 % --- Executes on button press in loadButton.
@@ -301,6 +339,14 @@ function loadButton_Callback(hObject, eventdata, handles)
 % hObject    handle to loadButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+[fileName, path, ~] = uigetfile('.wmtp', 'Please select a .wmtp file');
+if fileName == 0
+    return;
+end
+
+file = fullfile(path, fileName);
+inputs = loadTestParamsFromFile(file);
+loadInputs(handles, inputs);
 
 
 % --- Executes on button press in creditButton.
@@ -309,3 +355,100 @@ function creditButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 figure(cBox);
+
+%%--Helpers--
+function inputs = readInputs(handles)
+%outputs what the user input
+counter = 1;
+fn = get(handles.fn, 'string');
+inputs{counter} = fn;
+counter = counter + 1;
+
+ln = get(handles.ln, 'string');
+inputs{counter} = ln;
+counter = counter + 1;
+
+nr = get(handles.NR, 'string');
+inputs{counter} = nr;
+counter = counter + 1;
+
+isCons = num2str(get(handles.consOption, 'value'));
+inputs{counter} = isCons;
+counter = counter + 1;
+
+dr = get(handles.DR, 'string');
+inputs{counter} = dr;
+counter = counter + 1;
+
+tr = get(handles.TR2, 'string');
+inputs{counter} = tr;
+counter = counter + 1;
+
+da = get(handles.DA, 'string');
+inputs{counter} = da;
+counter = counter + 1;
+
+nt = get(handles.NT, 'string');
+inputs{counter} = nt;
+
+
+function loadInputs(handles, inputs)
+counter = 1;
+set(handles.fn, 'string', inputs{counter});
+counter = counter + 1;
+
+set(handles.ln, 'string', inputs{counter});
+counter = counter + 1;
+
+set(handles.NR, 'string', inputs{counter});
+counter = counter + 1;
+
+isCons = str2double(inputs{counter});
+if isCons == 1
+    set(handles.consOption, 'value', 1);
+    set(handles.digOption, 'value', 0);
+else
+    set(handles.consOption, 'value', 0);
+    set(handles.digOption, 'value', 1); 
+end
+counter = counter + 1;
+
+set(handles.DR, 'string', inputs{counter});
+counter = counter + 1;
+
+set(handles.TR2, 'string', inputs{counter});
+counter = counter + 1;
+
+set(handles.DA, 'string', inputs{counter});
+counter = counter + 1;
+
+set(handles.NT, 'string', inputs{counter});
+
+
+function saveToAppData(handles)
+%Save the test input params to appdata
+%to transfer to other figures
+inputs = readInputs(handles);
+setappdata(0, 'inputs', inputs);
+
+
+function TR2_Callback(hObject, eventdata, handles)
+% hObject    handle to TR2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of TR2 as text
+%        str2double(get(hObject,'String')) returns contents of TR2 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function TR2_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to TR2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
