@@ -22,7 +22,7 @@ function varargout = openingScreen(varargin)
 
 % Edit the above text to modify the response to help openingScreen
 
-% Last Modified by GUIDE v2.5 06-Nov-2015 10:40:21
+% Last Modified by GUIDE v2.5 06-Nov-2015 11:14:54
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -272,3 +272,40 @@ function NT_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in quitButton.
+function quitButton_Callback(hObject, eventdata, handles)
+% hObject    handle to quitButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+close;
+
+
+% --- Executes on button press in goButton.
+function goButton_Callback(hObject, eventdata, handles)
+% hObject    handle to goButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in saveButton.
+function saveButton_Callback(hObject, eventdata, handles)
+% hObject    handle to saveButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in loadButton.
+function loadButton_Callback(hObject, eventdata, handles)
+% hObject    handle to loadButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in creditButton.
+function creditButton_Callback(hObject, eventdata, handles)
+% hObject    handle to creditButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+figure(cBox);
