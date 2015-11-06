@@ -135,6 +135,9 @@ function NR_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of NR as text
 %        str2double(get(hObject,'String')) returns contents of NR as a double
+NR = str2double(get(hObject, 'String'));
+NR = min(20, max(1, NR));   %max is not shown to the user
+set(hObject, 'String', num2str(NR));
 
 
 % --- Executes during object creation, after setting all properties.
@@ -175,6 +178,9 @@ function DR_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of DR as text
 %        str2double(get(hObject,'String')) returns contents of DR as a double
+DR = str2double(get(hObject, 'String'));
+DR = max(1, DR); 
+set(hObject, 'String', num2str(DR));
 
 
 % --- Executes during object creation, after setting all properties.
@@ -198,6 +204,9 @@ function TR_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of TR as text
 %        str2double(get(hObject,'String')) returns contents of TR as a double
+TR = str2double(get(hObject, 'String'));
+TR = max(1, TR); 
+set(hObject, 'String', num2str(TR));
 
 
 % --- Executes during object creation, after setting all properties.
@@ -221,6 +230,9 @@ function DA_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of DA as text
 %        str2double(get(hObject,'String')) returns contents of DA as a double
+DA = str2double(get(hObject, 'String'));
+DA = max(1, DA); 
+set(hObject, 'String', num2str(DA));
 
 
 % --- Executes during object creation, after setting all properties.
@@ -244,6 +256,9 @@ function NT_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of NT as text
 %        str2double(get(hObject,'String')) returns contents of NT as a double
+NT = str2double(get(hObject, 'String'));
+NT = max(1, NT); 
+set(hObject, 'String', num2str(NT));
 
 
 % --- Executes during object creation, after setting all properties.
