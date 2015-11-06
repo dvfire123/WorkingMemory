@@ -22,7 +22,7 @@ function varargout = openingScreen(varargin)
 
 % Edit the above text to modify the response to help openingScreen
 
-% Last Modified by GUIDE v2.5 06-Nov-2015 15:56:18
+% Last Modified by GUIDE v2.5 06-Nov-2015 16:29:28
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -318,6 +318,15 @@ function goButton_Callback(hObject, eventdata, handles)
 % hObject    handle to goButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+global dataFolder;
+
+%First: save user inputs
+inputs = saveToAppData(handles);
+fileName = saveTestParamsToFile(dataFolder, inputs);
+updateLatest(fileName);
+
+%Next: show recall stimulus
+%(TODO)
 
 
 % --- Executes on button press in saveButton.
@@ -328,6 +337,7 @@ function saveButton_Callback(hObject, eventdata, handles)
 global dataFolder;
 inputs = readInputs(handles);
 fileName = saveTestParamsToFile(dataFolder, inputs);
+updateLatest(fileName);
 msg = sprintf('File saved to:\n%s!', fileName);
 msgbox(msg);
 
@@ -345,6 +355,7 @@ end
 file = fullfile(path, fileName);
 inputs = loadTestParamsFromFile(file);
 loadInputs(handles, inputs);
+updateLatest(fileName);
 
 
 % --- Executes on button press in creditButton.
@@ -423,8 +434,17 @@ counter = counter + 1;
 set(handles.NT, 'string', inputs{counter});
 
 
-function saveToAppData(handles)
+function inputs = saveToAppData(handles)
 %Save the test input params to appdata
 %to transfer to other figures
 inputs = readInputs(handles);
 setappdata(0, 'inputs', inputs);
+
+
+function updateLatest(fileName)
+%Updates the latest file
+global dataFolder latestFile;
+file = fullfile(dataFolder, fileName);
+fid = fopen(latestFile, 'wt+');
+fprintf(fid, '%s', file);
+fclose(fid);
