@@ -61,7 +61,7 @@ if isdeployed
     folder = pwd;
 end
 
-resultsFolder = fullfile(folder, 'UserData');
+resultsFolder = fullfile(folder, 'Results');
 if ~exist(resultsFolder, 'dir')
     mkdir(resultsFolder);
 end
