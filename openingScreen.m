@@ -325,9 +325,9 @@ inputs = saveToAppData(handles);
 fileName = saveTestParamsToFile(dataFolder, inputs);
 updateLatest(fileName);
 
-%Next: show recall stimulus
-%(TODO)
-
+%Next: show the instructions
+close;
+figure(ReadTheInstructionsBox);
 
 % --- Executes on button press in saveButton.
 function saveButton_Callback(hObject, eventdata, handles)
