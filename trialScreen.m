@@ -164,6 +164,7 @@ set(handles.trialLabel, 'visible', 'off');
 
 %Shows the stimulus
 set(handles.rememberLabel, 'visible', 'on');
+showRecallStim(handles);
 
 function turnOffNonReadyLabels(handles)
 %All labels not included in the ready page will be turned off here
@@ -206,4 +207,8 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 %Back-end stuff
-
+function showRecallStim(handles)
+global isCons NR;
+recallStim = getRecallStim(isCons, NR);
+set(handles.recallStimLabel, 'string', recallStim);
+set(handles.recallStimLabel, 'visible', 'on');
