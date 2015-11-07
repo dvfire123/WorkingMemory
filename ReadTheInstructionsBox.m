@@ -104,6 +104,6 @@ keyPressed = eventdata.Key;
 switch keyPressed
     case 'space'
         %continue to test
-        %temp
         close;
+        figure(trialScreen);
 end
