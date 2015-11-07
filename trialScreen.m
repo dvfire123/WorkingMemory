@@ -22,7 +22,7 @@ function varargout = trialScreen(varargin)
 
 % Edit the above text to modify the response to help trialScreen
 
-% Last Modified by GUIDE v2.5 06-Nov-2015 23:31:21
+% Last Modified by GUIDE v2.5 07-Nov-2015 13:14:38
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -167,5 +167,40 @@ set(handles.rememberLabel, 'visible', 'on');
 
 function turnOffNonReadyLabels(handles)
 %All labels not included in the ready page will be turned off here
+
+%recall stim
 set(handles.rememberLabel, 'visible', 'off');
 set(handles.recallStimLabel, 'visible', 'off');
+
+%ap
+set(handles.clickInstrLabel, 'visible', 'off');
+set(handles.apRes, 'visible', 'off');
+set(handles.apLabel, 'visible', 'off');
+
+%final recall
+set(handles.enterRecall, 'visible', 'off');
+set(handles.recall, 'visible', 'off');
+set(handles.overallScore, 'visible', 'off');
+set(handles.nextSpace, 'visible', 'off');
+
+
+function recall_Callback(hObject, eventdata, handles)
+% hObject    handle to recall (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of recall as text
+%        str2double(get(hObject,'String')) returns contents of recall as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function recall_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to recall (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
