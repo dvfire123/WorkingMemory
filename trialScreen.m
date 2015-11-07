@@ -55,6 +55,9 @@ global inputs resultsFolder;
 global NR isCons DR TR DA NT;
 global isIntro trialCount;
 
+%A bunch of labels need to be turned off to begin the screen
+turnOffNonReadyLabels(handles);
+
 %Making results folder
 [folder, ~, ~] = fileparts(mfilename('fullpath'));
 if isdeployed
@@ -140,7 +143,7 @@ global isIntro trialCount NT;
 
 if trialCount == NT
    close;
-   figure(openingScreen);
+   figure(endScreen);
    return;
 end
 
@@ -148,6 +151,7 @@ isIntro = 1;
 trialCount = trialCount + 1;
 set(handles.trialLabel, 'string',...
     sprintf('Trial: %d of %d', trialCount, NT));
+turnOffNonReadyLabels(handles);
 set(handles.contLabel, 'visible', 'on');
 set(handles.trialLabel, 'visible', 'on');
 
@@ -157,3 +161,11 @@ global isIntro;
 isIntro = 0;
 set(handles.contLabel, 'visible', 'off');
 set(handles.trialLabel, 'visible', 'off');
+
+%Shows the stimulus
+set(handles.rememberLabel, 'visible', 'on');
+
+function turnOffNonReadyLabels(handles)
+%All labels not included in the ready page will be turned off here
+set(handles.rememberLabel, 'visible', 'off');
+set(handles.recallStimLabel, 'visible', 'off');
