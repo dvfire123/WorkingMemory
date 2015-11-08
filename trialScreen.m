@@ -53,7 +53,9 @@ function trialScreen_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to trialScreen (see VARARGIN)
 global inputs resultsFolder;
 global NR isCons DR TR DA NT;
-global isIntro trialCount;
+global isIntro isAp trialCount;
+global DRtimer TRtimer DAtimer DRtimeleft TRtimeleft DAtimeleft;
+global corrStr totAns percentRight; %for the APs
 
 %A bunch of labels need to be turned off to begin the screen
 turnOffNonReadyLabels(handles);
@@ -86,11 +88,24 @@ NT = str2double(inputs{8});
 
 %Additional settings
 isIntro = 1;
+isAp = 0;
 trialCount = 1;
+corrStr = '--';
+totAns = 0;
+percentRight = '--';
 
 %display the trialLabel
 trialText = sprintf('Trial: %d of %d', trialCount, NT);
 set(handles.trialLabel, 'string', trialText);
+
+%%--Timers--%%
+DRtimer = timer;
+DRtimer.period = 1; %counts down in seconds intervals
+set(DRtimer,'ExecutionMode','fixedrate','StartDelay', 0);
+set(DRtimer, 'StartFcn', {@showRecallStim, handles});
+set(DRtimer, 'TimerFcn', {@countDown, handles, 1});
+set(DRtimer, 'StopFcn', {@startAp, handles});
+DRtimeleft = DR;
 
 % Choose default command line output for trialScreen
 handles.output = hObject;
@@ -101,6 +116,71 @@ guidata(hObject, handles);
 % UIWAIT makes trialScreen wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
+%%--Timer Callbacks--%%
+%DA start
+function showRecallStim(~, ~, handles)
+global recallStim;
+global isCons NR;
+global DA DAtimeleft;
+
+DAtimeleft = DA;
+disp(DAtimeleft);
+recallStim = getRecallStim(isCons, NR);
+set(handles.recallStimLabel, 'string', recallStim);
+set(handles.recallStimLabel, 'visible', 'on');
+
+%DA stop
+function startAp(~, ~, handles)
+global DAtimeleft DA;
+global corrStr totAns percentRight;
+
+DAtimeleft = DA;
+set(handles.enterRecall, 'visible', 'off');
+set(handles.recallStimLabel, 'visible', 'off');
+
+%creates the AP
+[res, minuend, answer] = makeAp();
+msg = sprintf('%s: %s\n%s: %d\n%s: %s percent', ...
+    'Previous Answer', corrStr, ...
+    'Total number correct answers thus far: ', totAns,...
+    'Total percent correct thus far: ', percentRight...
+    );
+set(handles.overallScore, 'string', msg);
+set(handles.clickInstrLabel, 'visible', 'on');
+set(handles.overallScore, 'visible', 'on');
+
+minStr = num2str(minuend);
+ansStr = num2str(answer);
+apText = sprintf('%s\n-3\n-----\n%s',...
+    minStr, ansStr);
+set(handles.apLabel, 'string', apText);
+set(handles.apLabel, 'visible', 'on');
+
+
+%All three timers timerfcn
+function countDown(~, ~, handles, type)
+%1: DR countdown
+%2: TR countdown
+%3: DA countdown
+global DRtimer TRtimer DAtimer DRtimeleft TRtimeleft DAtimeleft;
+switch type
+    case 1
+      DRtimeleft = DRtimeleft - 1;
+      if DRtimeleft <= 0
+          stop(DRtimer);
+      end
+    case 2
+      TRtimeleft = TRtimeleft - 1;
+      if TRtimeleft <= 0
+          stop(TRtimer);
+      end
+    case 3
+      DAtimeleft = DAtimeleft - 1;
+      if DAtimeleft <= 0
+          stop(DAtimer);
+      end 
+end
+%%--End Timer Callbacks--%%
 
 % --- Outputs from this function are returned to the command line.
 function varargout = trialScreen_OutputFcn(hObject, eventdata, handles) 
@@ -157,14 +237,14 @@ set(handles.trialLabel, 'visible', 'on');
 
 function moveToTest(handles)
 %User begins the test
-global isIntro;
+global isIntro DRtimer;
 isIntro = 0;
 set(handles.contLabel, 'visible', 'off');
 set(handles.trialLabel, 'visible', 'off');
 
 %Shows the stimulus
 set(handles.rememberLabel, 'visible', 'on');
-showRecallStim(handles);
+start(DRtimer);
 
 function turnOffNonReadyLabels(handles)
 %All labels not included in the ready page will be turned off here
@@ -205,10 +285,3 @@ function recall_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-%Back-end stuff
-function showRecallStim(handles)
-global isCons NR;
-recallStim = getRecallStim(isCons, NR);
-set(handles.recallStimLabel, 'string', recallStim);
-set(handles.recallStimLabel, 'visible', 'on');
