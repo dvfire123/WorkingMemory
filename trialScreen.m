@@ -117,24 +117,23 @@ guidata(hObject, handles);
 % uiwait(handles.figure1);
 
 %%--Timer Callbacks--%%
-%DA start
+%DR start
 function showRecallStim(~, ~, handles)
 global recallStim;
 global isCons NR;
-global DA DAtimeleft;
+global DR DRtimeleft;
 
-DAtimeleft = DA;
-disp(DAtimeleft);
+DRtimeleft = DR;
 recallStim = getRecallStim(isCons, NR);
 set(handles.recallStimLabel, 'string', recallStim);
 set(handles.recallStimLabel, 'visible', 'on');
 
-%DA stop
+%DR stop
 function startAp(~, ~, handles)
-global DAtimeleft DA;
-global corrStr totAns percentRight;
+global DR DRtimeleft;
+global corrStr totAns percentRight res;
 
-DAtimeleft = DA;
+DRtimeleft = DR;
 set(handles.enterRecall, 'visible', 'off');
 set(handles.recallStimLabel, 'visible', 'off');
 
