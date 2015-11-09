@@ -51,7 +51,7 @@ function trialScreen_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to trialScreen (see VARARGIN)
-global inputs resultsFolder;
+global inputs resultsFolder resFile;
 global NR isCons DR TR DA NT;
 global isIntro isAp trialCount;
 global DRtimer TRtimer DAtimer DRtimeleft TRtimeleft DAtimeleft;
@@ -97,6 +97,34 @@ percentRight = '--';
 %display the trialLabel
 trialText = sprintf('Trial: %d of %d', trialCount, NT);
 set(handles.trialLabel, 'string', trialText);
+
+%%--User Logging--%%
+%Logs the header for the experiment run
+fn = inputs{1};
+ln = inputs{2};
+resFileName = sprintf('%s-%s-out.txt', fn, ln);
+resFile = fullfile(resultsFolder, resFileName);
+
+if ~exist(resFile, 'file')
+   fid = fopen(resFile, 'wt+');
+   fclose(fid);
+end
+
+fid = fopen(resFile, 'at+');    %appending results
+fprintf(fid, 'Name %s %s\n', fn, ln);
+fprintf(fid, '%s\n\n', datestr(now));    %timestamp
+fprintf(fid, 'NR--Number of recall items %d\n', NR);
+typeRecall = 'Consonants';
+if isCons == 0
+   typeRecall = 'Digits'; 
+end
+fprintf(fid, 'Type of recall item %s\n', typeRecall);
+fprintf(fid, 'DR--Time of which recall stimulus is displayed (s) %f\n', DR);
+fprintf(fid, 'TR--Total time of evaluating all arithmetic problems (s) %f\n', TR);
+fprintf(fid, 'DA--Maximum time of which each arithmetic problem is displayed (s) %f\n', DA);
+fprintf(fid, 'NT--Number of Trials %d\n', NT);
+fprintf(fid, '\nTrial Results:\n');
+fclose(fid);
 
 %%--Timers--%%
 DRtimer = timer;
