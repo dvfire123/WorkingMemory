@@ -22,7 +22,7 @@ function varargout = endScreen(varargin)
 
 % Edit the above text to modify the response to help endScreen
 
-% Last Modified by GUIDE v2.5 07-Nov-2015 12:47:07
+% Last Modified by GUIDE v2.5 09-Nov-2015 14:43:44
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -87,4 +87,3 @@ switch key
         close;
         figure(openingScreen);
 end
-

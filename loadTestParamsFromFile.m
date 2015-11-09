@@ -3,7 +3,7 @@ function inputs = loadTestParamsFromFile(file)
     fid = fopen(file, 'r');
     if fid == -1
         inputs = {};
-        errordlg('Cannot load file!');
+        %errordlg('Cannot load file!');
         return;
     end
     
