@@ -279,6 +279,7 @@ function figure1_WindowKeyPressFcn(hObject, eventdata, handles)
 %	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
 % handles    structure with handles and user data (see GUIDATA)
 global isIntro isTypingRecall;
+global isAp DAtimer isNoResponse;
 
 keyPressed = eventdata.Key;
 switch keyPressed
@@ -286,13 +287,21 @@ switch keyPressed
         if isIntro == 1
             moveToTest(handles);
         elseif isTypingRecall == 1
+            logUserResponse();
             goToBeginningOfTrial(handles);
         end
-    case 'k'
-        %This is just for debugging
-        %will remove in the end
-        goToBeginningOfTrial(handles);
+    case 'y'
+        if isAp ~= 0
+            apResponse(1);
+        end
+    case 'n'
+        if isAp ~= 0
+            apResponse(0);
+        end
 end
+
+isNoResponse = 0;
+stop(DAtimer);
 
 %%--helpers--%%
 function logUserResponse()
@@ -329,11 +338,7 @@ fclose(fid);
 
 function goToBeginningOfTrial(handles)
 %User front end to return test screen to beginning of a trial
-%TODO: a bunch of stuff goes away
 global isIntro trialCount NT isTypingRecall isAp;
-
-%Log the results
-logUserResponse();
 
 if trialCount == NT
    close;
@@ -383,7 +388,7 @@ ovScoreText = sprintf('%s\n    %s: %d\n%s: \d percent', ...
     'Number of response correctly answered', totAns, ...
     'Percentage of correct answers', percentRight...
     );
-set(handels.overallScore, 'string', ovScoreText);
+set(handles.overallScore, 'string', ovScoreText);
 
 set(handles.enterRecall, 'visible', 'on');
 set(handles.recall, 'visible', 'on');
@@ -439,27 +444,8 @@ function figure1_WindowButtonDownFcn(hObject, eventdata, handles)
 % hObject    handle to figure1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global isAp DATimer isNoResponse;
-if isAp == 0
-    return;
-end
-
-isNoResponse = 0;
-
-click = get(handles.figure1, 'selectionType');
-switch click
-    case 'normal'
-        %left click--YES
-        apResponse(1);
-    case 'alt'
-        %right click--NO
-        apResponse(0);
-end
-
-stop(DATimer);
 
 
-%%--Response Functions--%%
 %Ap Response:
 function apResponse(responseType)
 %responseTypes: 0--no, 1--yes, 2--no response
