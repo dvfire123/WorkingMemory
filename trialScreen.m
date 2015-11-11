@@ -233,16 +233,20 @@ function countDown(~, ~, type)
 %2: TR countdown
 %3: DA countdown
 global DRtimer TRtimer DRtimeleft TRtimeleft;
+global DR TR;
 switch type
     case 1
       DRtimeleft = DRtimeleft - 1;
       if DRtimeleft < 0
           stop(DRtimer);
+          DRtimeleft = DR;
       end
     case 2
+      disp(TRtimeleft);
       TRtimeleft = TRtimeleft - 1;
       if TRtimeleft < 0
           stop(TRtimer);
+          TRtimeleft = TR;
       end 
 end
 %%--End Timer Callbacks--%%
@@ -335,6 +339,8 @@ function goToBeginningOfTrial(handles)
 global isIntro trialCount NT isTypingRecall isAp;
 global corrStr totAns percentRight;
 global TR TRtimeleft DR DRtimeleft;
+
+fprintf('trial: %d of %d\n', trialCount, NT);
 
 if trialCount == NT
    close;
