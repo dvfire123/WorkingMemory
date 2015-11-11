@@ -240,12 +240,12 @@ global DRtimer TRtimer DRtimeleft TRtimeleft;
 switch type
     case 1
       DRtimeleft = DRtimeleft - 1;
-      if DRtimeleft <= 0
+      if DRtimeleft < 0
           stop(DRtimer);
       end
     case 2
       TRtimeleft = TRtimeleft - 1;
-      if TRtimeleft <= 0
+      if TRtimeleft < 0
           stop(TRtimer);
       end 
 end
@@ -274,12 +274,15 @@ global isIntro isTypingRecall;
 global isAp DAtimer;
 
 keyPressed = eventdata.Key;
+%disp(keyPressed);
 switch keyPressed
     case 'space'
         if isIntro == 1
             moveToTest(handles);
         elseif isTypingRecall == 1
             logUserResponse();
+            isTypingRecall = 0;
+            isIntro = 1;
             goToBeginningOfTrial(handles);
         end
     case 'y'
@@ -315,14 +318,14 @@ end
 fprintf(fid, 'Trial %d out of %d\n\n', trialCount, NT);
 fprintf(fid, 'Recall stimulus results:\n');
 fprintf(fid, 'Actual %s\n', recallStim);
-fprintf(fid, 'userTyped %s\n', userTyped);
+fprintf(fid, 'User typed %s\n', userTyped);
 fprintf(fid, 'Arithmetic Problem Results:\n');
 fprintf(fid, 'Number of "Correct" responses when actual answer is "Correct" %d\n', corrCount(1));
-fprintf(fid, 'Number of "Inorrect" responses when actual answer is "Correct" %d\n', corrCount(2));
-fprintf(fid, 'Number of "No reponse" responses when actual answer is "Correct" %d\n', corrCount(3));
-fprintf(fid, 'Number of "Correct" responses when actual answer is "Inorrect" %d\n', corrCount(4));
-fprintf(fid, 'Number of "Inorrect" responses when actual answer is "Inorrect" %d\n', corrCount(5));
-fprintf(fid, 'Number of "No reponse" responses when actual answer is "Inorrect" %d\n', corrCount(6));
+fprintf(fid, 'Number of "Incorrect" responses when actual answer is "Correct" %d\n', corrCount(2));
+fprintf(fid, 'Number of "No response" responses when actual answer is "Correct" %d\n', corrCount(3));
+fprintf(fid, 'Number of "Correct" responses when actual answer is "Incorrect" %d\n', corrCount(4));
+fprintf(fid, 'Number of "Incorrect" responses when actual answer is "Incorrect" %d\n', corrCount(5));
+fprintf(fid, 'Number of "No response" responses when actual answer is "Incorrect" %d\n', corrCount(6));
 fprintf(fid, 'Percentage of responses correctly answered %d\n', percentRight);
 fprintf(fid, 'Total number of arithmetic problems seen %d\n', totalAp);
 fprintf(fid, 'Average time spent per arithmetic problem (s) %s\n', avgTimePerAp); 
@@ -340,6 +343,7 @@ if trialCount == NT
    return;
 end
 
+%reset flags
 isIntro = 1;
 isAp = 0;
 isTypingRecall = 0;
@@ -380,12 +384,13 @@ set(handles.apRes, 'visible', 'off');
 set(handles.apLabel, 'visible', 'off');
 
 %turn on the recall stimulus labels
-ovScoreText = sprintf('%s\n    %s: %d\n%s: %d percent', ...
+ovScoreText = sprintf('%s\n    %s: %d\n     %s: %s percent', ...
     'Your overall score on subtraction task', ...
     'Number of response correctly answered', totAns, ...
     'Percentage of correct answers', percentRight...
     );
 set(handles.overallScore, 'string', ovScoreText);
+set(handles.recall, 'string', '');  %clean the space to enter recall
 
 set(handles.enterRecall, 'visible', 'on');
 set(handles.recall, 'visible', 'on');
@@ -448,6 +453,7 @@ function apResponse(responseType)
 %responseTypes: 0--no, 1--yes, 2--no response
 global res corrCount corrStr totAns totalAp percentRight;
 totalAp = totalAp + 1;
+disp(totalAp);
 
 switch responseType
     case 0
@@ -483,4 +489,4 @@ switch responseType
         corrStr = 'Incorrect (No response given)';
 end
 
-percentRight = round((totAns/totalAp) * 100);
+percentRight = num2str(round((totAns/totalAp) * 100));

@@ -6,10 +6,10 @@ function [res, minuend, answer] = makeAp()
     
     %produces a random odd three-digit integer
     minuend = ceil(449*rand)*2 + 101; 
-    wrong = rand < 0.5;
+    wrong = rand < -1;
     res = 1;
     subtrahend = 3;
-    if wrong
+    if wrong == 1
         res = 0;
         offset = floor(5*rand)*2 + 1;
         if rand < 0.5
