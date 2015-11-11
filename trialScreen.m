@@ -91,9 +91,9 @@ isIntro = 1;
 isAp = 0;
 isTypingRecall = 0;
 trialCount = 1;
-corrStr = '--';
+corrStr = 'N/A';
 totAns = 0;
-percentRight = '--';
+percentRight = 'N/A';
 corrCount = zeros(6, 1);
 
 %display the trialLabel
@@ -146,11 +146,10 @@ set(TRtimer, 'StopFcn', {@letUserTypeRecall, handles});
 TRtimeleft = TR;
 
 DAtimer = timer;
-DAtimer.period = 1; %counts down in seconds intervals
+DAtimer.period = DA; %every DA seconds new AP
 set(DAtimer,'ExecutionMode','fixedrate','StartDelay', 0);
-set(DAtimer, 'StartFcn', {@resetDAcounter, handles});
-set(DAtimer, 'TimerFcn', {@countDown, 3});
-set(DAtimer, 'StopFcn', {@logApNoResponse});
+set(DAtimer, 'StartFcn', {@startDACounter, handles});
+set(DAtimer, 'TimerFcn', {@logApNoResponse, handles});
 
 % Choose default command line output for trialScreen
 handles.output = hObject;
@@ -194,17 +193,14 @@ start(DAtimer);
 
 %TR Stop
 function letUserTypeRecall(~, ~, handles)
-global isAp;
+global isAp DAtimer;
 isAp = 0;
+stop(DAtimer);
 goToUserTypeRs(handles);
 
-%DA Start
-function resetDAcounter(~, ~, handles)
-global DAtimeleft DA isNoResponse;
+%DA Helper
+function showNextAp(handles)
 global corrStr totAns percentRight res;
-
-DAtimeleft = DA;
-isNoResponse = 1;
 
 [res, minuend, answer] = makeAp();
 msg = sprintf('%s: %s\n%s: %d\n%s: %s percent', ...
@@ -223,23 +219,24 @@ apText = sprintf('%s\n-3\n-----\n%s',...
 set(handles.apLabel, 'string', apText);
 set(handles.apLabel, 'visible', 'on');
 
-%DA Stop
-function logApNoResponse(~, ~)
-global DAtimer isNoResponse;
 
-if isNoResponse == 1
-    apResponse(2);
-end
-
-start(DAtimer);
+%DA Start
+function startDACounter(~, ~, handles)
+showNextAp(handles);
 
 
-%All three timers timerfcn
+%DA Timer Fcn
+function logApNoResponse(~, ~, handles)
+apResponse(2);
+showNextAp(handles)
+
+
+%Timerfcn for DR and TR
 function countDown(~, ~, type)
 %1: DR countdown
 %2: TR countdown
 %3: DA countdown
-global DRtimer TRtimer DAtimer DRtimeleft TRtimeleft DAtimeleft;
+global DRtimer TRtimer DRtimeleft TRtimeleft;
 switch type
     case 1
       DRtimeleft = DRtimeleft - 1;
@@ -250,11 +247,6 @@ switch type
       TRtimeleft = TRtimeleft - 1;
       if TRtimeleft <= 0
           stop(TRtimer);
-      end
-    case 3
-      DAtimeleft = DAtimeleft - 1;
-      if DAtimeleft <= 0
-          stop(DAtimer);
       end 
 end
 %%--End Timer Callbacks--%%
@@ -279,7 +271,7 @@ function figure1_WindowKeyPressFcn(hObject, eventdata, handles)
 %	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
 % handles    structure with handles and user data (see GUIDATA)
 global isIntro isTypingRecall;
-global isAp DAtimer isNoResponse;
+global isAp DAtimer;
 
 keyPressed = eventdata.Key;
 switch keyPressed
@@ -293,15 +285,16 @@ switch keyPressed
     case 'y'
         if isAp ~= 0
             apResponse(1);
+            stop(DAtimer);
+            start(DAtimer);
         end
     case 'n'
         if isAp ~= 0
             apResponse(0);
+            stop(DAtimer);
+            start(DAtimer);
         end
 end
-
-isNoResponse = 0;
-stop(DAtimer);
 
 %%--helpers--%%
 function logUserResponse()
@@ -319,7 +312,7 @@ else
     avgTimePerAp = 'N/A';
 end
 
-fprintf('Trial %d out of %d\n-----\n', trialCount, NT);
+fprintf(fid, 'Trial %d out of %d\n\n', trialCount, NT);
 fprintf(fid, 'Recall stimulus results:\n');
 fprintf(fid, 'Actual %s\n', recallStim);
 fprintf(fid, 'userTyped %s\n', userTyped);
@@ -339,6 +332,7 @@ fclose(fid);
 function goToBeginningOfTrial(handles)
 %User front end to return test screen to beginning of a trial
 global isIntro trialCount NT isTypingRecall isAp;
+global corrStr totAns percentRight
 
 if trialCount == NT
    close;
@@ -349,6 +343,9 @@ end
 isIntro = 1;
 isAp = 0;
 isTypingRecall = 0;
+corrStr = 'N/A';
+totAns = 0;
+percentRight = 'N/A';
 
 trialCount = trialCount + 1;
 set(handles.trialLabel, 'string',...
@@ -383,7 +380,7 @@ set(handles.apRes, 'visible', 'off');
 set(handles.apLabel, 'visible', 'off');
 
 %turn on the recall stimulus labels
-ovScoreText = sprintf('%s\n    %s: %d\n%s: \d percent', ...
+ovScoreText = sprintf('%s\n    %s: %d\n%s: %d percent', ...
     'Your overall score on subtraction task', ...
     'Number of response correctly answered', totAns, ...
     'Percentage of correct answers', percentRight...
@@ -449,7 +446,7 @@ function figure1_WindowButtonDownFcn(hObject, eventdata, handles)
 %Ap Response:
 function apResponse(responseType)
 %responseTypes: 0--no, 1--yes, 2--no response
-global res corrCount corrString totAns totalAp percentRight;
+global res corrCount corrStr totAns totalAp percentRight;
 totalAp = totalAp + 1;
 
 switch responseType
@@ -457,22 +454,22 @@ switch responseType
        %Response of No to AP
        if res == 0
           %'incorrect' response when actual = 'incorrect'
-          corrString = 'Correct';
+          corrStr = 'Correct';
           totAns = totAns + 1;
           corrCount(5) = corrCount(5) + 1;
        else
-          corrString = 'Incorrect';
+          corrStr = 'Incorrect';
           corrCount(2) = corrCount(2) + 1;
        end
     case 1
         %Response of Yes to AP
         if res == 1
           %'correct' response when actual = 'correct'
-          corrString = 'Correct';
+          corrStr = 'Correct';
           totAns = totAns + 1;
           corrCount(1) = corrCount(1) + 1;
        else
-          corrString = 'Incorrect';
+          corrStr = 'Incorrect';
           corrCount(4) = corrCount(4) + 1;
         end
     case 2
@@ -483,7 +480,7 @@ switch responseType
            corrCount(6) = corrCount(6) + 1; 
         end
         
-        corrString = 'Incorrect (No response given)';
+        corrStr = 'Incorrect (No response given)';
 end
 
 percentRight = round((totAns/totalAp) * 100);
