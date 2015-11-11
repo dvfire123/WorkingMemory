@@ -375,10 +375,11 @@ start(DRtimer);
 function goToUserTypeRs(handles)
 %Here the user is presented with window to type
 %out the recall stimulus
-global isTypingRecall isAp;
+global isTypingRecall isAp isIntro;
 global totAns percentRight;
 
 isTypingRecall = 1;
+isIntro = 0;
 isAp = 0;
 
 %turn off all ap labels
