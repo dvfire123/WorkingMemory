@@ -140,15 +140,14 @@ DRtimeleft = DR;
 TRtimer = timer;
 TRtimer.period = 1; %counts down in seconds intervals
 set(TRtimer,'ExecutionMode','fixedrate','StartDelay', 0);
-set(TRtimer, 'StartFcn', {@enterApMode});
+set(TRtimer, 'StartFcn', {@enterApMode, handles});
 set(TRtimer, 'TimerFcn', {@countDown, 2});
 set(TRtimer, 'StopFcn', {@letUserTypeRecall, handles});
 TRtimeleft = TR;
 
 DAtimer = timer;
 DAtimer.period = DA; %every DA seconds new AP
-set(DAtimer,'ExecutionMode','fixedrate','StartDelay', 0);
-set(DAtimer, 'StartFcn', {@startDACounter, handles});
+set(DAtimer,'ExecutionMode','fixedrate','StartDelay', DA);
 set(DAtimer, 'TimerFcn', {@logApNoResponse, handles});
 
 % Choose default command line output for trialScreen
@@ -183,12 +182,13 @@ set(handles.recallStimLabel, 'visible', 'off');
 start(TRtimer);
 
 %TR Start
-function enterApMode(~, ~)
+function enterApMode(~, ~, handles)
 global isAp totalAp;
 global DAtimer;
 
 isAp = 1;
 totalAp = 0;
+showNextAp(handles);
 start(DAtimer);
 
 %TR Stop
@@ -220,15 +220,11 @@ set(handles.apLabel, 'string', apText);
 set(handles.apLabel, 'visible', 'on');
 
 
-%DA Start
-function startDACounter(~, ~, handles)
-showNextAp(handles);
-
-
 %DA Timer Fcn
 function logApNoResponse(~, ~, handles)
+%If timed out
 apResponse(2);
-showNextAp(handles)
+showNextAp(handles);
 
 
 %Timerfcn for DR and TR
@@ -289,12 +285,14 @@ switch keyPressed
         if isAp ~= 0
             apResponse(1);
             stop(DAtimer);
+            showNextAp(handles);
             start(DAtimer);
         end
     case 'n'
         if isAp ~= 0
             apResponse(0);
             stop(DAtimer);
+            showNextAp(handles);
             start(DAtimer);
         end
 end
@@ -335,7 +333,8 @@ fclose(fid);
 function goToBeginningOfTrial(handles)
 %User front end to return test screen to beginning of a trial
 global isIntro trialCount NT isTypingRecall isAp;
-global corrStr totAns percentRight
+global corrStr totAns percentRight;
+global TR TRtimeleft DR DRtimeleft;
 
 if trialCount == NT
    close;
@@ -350,6 +349,10 @@ isTypingRecall = 0;
 corrStr = 'N/A';
 totAns = 0;
 percentRight = 'N/A';
+
+%Reset timers
+TRtimeleft = TR;
+DRtimeleft = DR;
 
 trialCount = trialCount + 1;
 set(handles.trialLabel, 'string',...
@@ -453,7 +456,6 @@ function apResponse(responseType)
 %responseTypes: 0--no, 1--yes, 2--no response
 global res corrCount corrStr totAns totalAp percentRight;
 totalAp = totalAp + 1;
-disp(totalAp);
 
 switch responseType
     case 0
