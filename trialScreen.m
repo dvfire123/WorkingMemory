@@ -320,7 +320,7 @@ fprintf(fid, 'Number of "No response" responses when actual answer is "Correct" 
 fprintf(fid, 'Number of "Correct" responses when actual answer is "Incorrect" %d\n', corrCount(4));
 fprintf(fid, 'Number of "Incorrect" responses when actual answer is "Incorrect" %d\n', corrCount(5));
 fprintf(fid, 'Number of "No response" responses when actual answer is "Incorrect" %d\n', corrCount(6));
-fprintf(fid, 'Percentage of responses correctly answered %d percent\n', percentRight);
+fprintf(fid, 'Percentage of responses correctly answered %s percent\n', percentRight);
 fprintf(fid, 'Total number of arithmetic problems seen %d\n', totalAp);
 fprintf(fid, 'Average time spent per arithmetic problem (s) %s\n', avgTimePerAp); 
 fprintf(fid, '-----------\n\n');
@@ -329,7 +329,7 @@ fclose(fid);
 function goToBeginningOfTrial(handles)
 %User front end to return test screen to beginning of a trial
 global isIntro trialCount NT isAp;
-global corrStr totAns percentRight;
+global corrStr corrCount totAns percentRight;
 global TR TRtimeleft DR DRtimeleft;
 
 if trialCount == NT
@@ -341,9 +341,12 @@ end
 %reset flags
 isIntro = 1;
 isAp = 0;
+
+%reset stats
 corrStr = 'N/A';
 totAns = 0;
 percentRight = 'N/A';
+corrCount = zeros(6, 1);
 
 %Reset timers
 TRtimeleft = TR;
