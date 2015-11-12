@@ -230,20 +230,18 @@ showNextAp(handles);
 function countDown(~, ~, type)
 %1: DR countdown
 %2: TR countdown
-%3: DA countdown
 global DRtimer TRtimer DRtimeleft TRtimeleft;
-global DR TR;
 switch type
     case 1
+      %fprintf('DR Time Left: %d\n', DRtimeleft);
       DRtimeleft = DRtimeleft - 1;
       if DRtimeleft < 0
-          DRtimeleft = DR;
           stop(DRtimer);
       end
     case 2
+      %fprintf('TR Time Left: %d\n', TRtimeleft);
       TRtimeleft = TRtimeleft - 1;
       if TRtimeleft < 0
-          TRtimeleft = TR;
           stop(TRtimer);
       end 
 end
