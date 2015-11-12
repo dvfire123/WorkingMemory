@@ -284,7 +284,7 @@ switch keyPressed
             showNextAp(handles);
             start(DAtimer);
         end
-    case '/'
+    case 'slash'
         if isAp ~= 0
             apResponse(0);
             stop(DAtimer);
