@@ -292,8 +292,8 @@ switch keyPressed
 end
 
 %%--helpers--%%
-function logUserResponse()
-global resFile NT trialCount recallStim userTyped;
+function logUserResponse(handles)
+global resFile NT trialCount recallStim;
 global corrCount percentRight totalAp TR;
 fid = fopen(resFile, 'at+');
 if fid == -1
@@ -306,6 +306,8 @@ if totalAp > 0
 else
     avgTimePerAp = 'N/A';
 end
+
+userTyped = get(handles.recall, 'string');
 
 fprintf(fid, 'Trial %d out of %d\n\n', trialCount, NT);
 fprintf(fid, 'Recall stimulus results:\n');
@@ -423,8 +425,7 @@ function recall_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of recall as text
 %        str2double(get(hObject,'String')) returns contents of recall as a double
-global userTyped;
-userTyped = get(hObject, 'String');
+
 
 % --- Executes during object creation, after setting all properties.
 function recall_CreateFcn(hObject, eventdata, handles)
@@ -495,5 +496,5 @@ function doneButton_Callback(hObject, eventdata, handles)
 % hObject    handle to doneButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-logUserResponse();
+logUserResponse(handles);
 goToBeginningOfTrial(handles);
