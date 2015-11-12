@@ -22,7 +22,7 @@ function varargout = trialScreen(varargin)
 
 % Edit the above text to modify the response to help trialScreen
 
-% Last Modified by GUIDE v2.5 10-Nov-2015 11:38:47
+% Last Modified by GUIDE v2.5 11-Nov-2015 19:05:28
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -53,7 +53,7 @@ function trialScreen_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to trialScreen (see VARARGIN)
 global inputs resultsFolder resFile;
 global NR isCons DR TR DA NT;
-global isIntro isAp isTypingRecall trialCount;
+global isIntro isAp trialCount;
 global DRtimer TRtimer DAtimer DRtimeleft TRtimeleft;
 global corrStr totAns percentRight corrCount; %for the APs
 
@@ -89,7 +89,6 @@ NT = str2double(inputs{8});
 %Additional settings
 isIntro = 1;
 isAp = 0;
-isTypingRecall = 0;
 trialCount = 1;
 corrStr = 'N/A';
 totAns = 0;
@@ -130,20 +129,20 @@ fclose(fid);
 
 %%--Timers--%%
 DRtimer = timer;
+DRtimeleft = DR;
 DRtimer.period = 1; %counts down in seconds intervals
 set(DRtimer,'ExecutionMode','fixedrate','StartDelay', 0);
 set(DRtimer, 'StartFcn', {@showRecallStim, handles});
 set(DRtimer, 'TimerFcn', {@countDown, 1});
 set(DRtimer, 'StopFcn', {@startAp, handles});
-DRtimeleft = DR;
 
 TRtimer = timer;
+TRtimeleft = TR;
 TRtimer.period = 1; %counts down in seconds intervals
 set(TRtimer,'ExecutionMode','fixedrate','StartDelay', 0);
 set(TRtimer, 'StartFcn', {@enterApMode, handles});
 set(TRtimer, 'TimerFcn', {@countDown, 2});
 set(TRtimer, 'StopFcn', {@letUserTypeRecall, handles});
-TRtimeleft = TR;
 
 DAtimer = timer;
 DAtimer.period = DA; %every DA seconds new AP
@@ -179,6 +178,7 @@ DRtimeleft = DR;
 set(handles.enterRecall, 'visible', 'off');
 set(handles.recallStimLabel, 'visible', 'off');
 
+showNextAp(handles);
 start(TRtimer);
 
 %TR Start
@@ -188,7 +188,6 @@ global DAtimer;
 
 isAp = 1;
 totalAp = 0;
-showNextAp(handles);
 start(DAtimer);
 
 %TR Stop
@@ -238,15 +237,14 @@ switch type
     case 1
       DRtimeleft = DRtimeleft - 1;
       if DRtimeleft < 0
-          stop(DRtimer);
           DRtimeleft = DR;
+          stop(DRtimer);
       end
     case 2
-      disp(TRtimeleft);
       TRtimeleft = TRtimeleft - 1;
       if TRtimeleft < 0
-          stop(TRtimer);
           TRtimeleft = TR;
+          stop(TRtimer);
       end 
 end
 %%--End Timer Callbacks--%%
@@ -270,29 +268,23 @@ function figure1_WindowKeyPressFcn(hObject, eventdata, handles)
 %	Character: character interpretation of the key(s) that was pressed
 %	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
 % handles    structure with handles and user data (see GUIDATA)
-global isIntro isTypingRecall;
+global isIntro;
 global isAp DAtimer;
 
 keyPressed = eventdata.Key;
-%disp(keyPressed);
 switch keyPressed
     case 'space'
         if isIntro == 1
             moveToTest(handles);
-        elseif isTypingRecall == 1
-            logUserResponse();
-            isTypingRecall = 0;
-            isIntro = 1;
-            goToBeginningOfTrial(handles);
         end
-    case 'y'
+    case 'z'
         if isAp ~= 0
             apResponse(1);
             stop(DAtimer);
             showNextAp(handles);
             start(DAtimer);
         end
-    case 'n'
+    case '/'
         if isAp ~= 0
             apResponse(0);
             stop(DAtimer);
@@ -328,7 +320,7 @@ fprintf(fid, 'Number of "No response" responses when actual answer is "Correct" 
 fprintf(fid, 'Number of "Correct" responses when actual answer is "Incorrect" %d\n', corrCount(4));
 fprintf(fid, 'Number of "Incorrect" responses when actual answer is "Incorrect" %d\n', corrCount(5));
 fprintf(fid, 'Number of "No response" responses when actual answer is "Incorrect" %d\n', corrCount(6));
-fprintf(fid, 'Percentage of responses correctly answered %d\n', percentRight);
+fprintf(fid, 'Percentage of responses correctly answered %d percent\n', percentRight);
 fprintf(fid, 'Total number of arithmetic problems seen %d\n', totalAp);
 fprintf(fid, 'Average time spent per arithmetic problem (s) %s\n', avgTimePerAp); 
 fprintf(fid, '-----------\n\n');
@@ -336,11 +328,9 @@ fclose(fid);
 
 function goToBeginningOfTrial(handles)
 %User front end to return test screen to beginning of a trial
-global isIntro trialCount NT isTypingRecall isAp;
+global isIntro trialCount NT isAp;
 global corrStr totAns percentRight;
 global TR TRtimeleft DR DRtimeleft;
-
-fprintf('trial: %d of %d\n', trialCount, NT);
 
 if trialCount == NT
    close;
@@ -351,7 +341,6 @@ end
 %reset flags
 isIntro = 1;
 isAp = 0;
-isTypingRecall = 0;
 corrStr = 'N/A';
 totAns = 0;
 percentRight = 'N/A';
@@ -381,10 +370,9 @@ start(DRtimer);
 function goToUserTypeRs(handles)
 %Here the user is presented with window to type
 %out the recall stimulus
-global isTypingRecall isAp isIntro;
+global isAp isIntro;
 global totAns percentRight;
 
-isTypingRecall = 1;
 isIntro = 0;
 isAp = 0;
 
@@ -395,7 +383,7 @@ set(handles.apLabel, 'visible', 'off');
 
 %turn on the recall stimulus labels
 ovScoreText = sprintf('%s\n    %s: %d\n    %s: %s percent', ...
-    'Your overall score on subtraction task', ...
+    'Your overall score on subtraction task:', ...
     'Number of response correctly answered', totAns, ...
     'Percentage of correct answers', percentRight...
     );
@@ -405,7 +393,10 @@ set(handles.recall, 'string', '');  %clean the space to enter recall
 set(handles.enterRecall, 'visible', 'on');
 set(handles.recall, 'visible', 'on');
 set(handles.overallScore, 'visible', 'on');
-set(handles.nextSpace, 'visible', 'on');
+set(handles.doneButton, 'visible', 'on');
+
+%Focus the cursor into the box
+uicontrol(handles.recall);
 
 
 function turnOffNonReadyLabels(handles)
@@ -424,7 +415,7 @@ set(handles.apLabel, 'visible', 'off');
 set(handles.enterRecall, 'visible', 'off');
 set(handles.recall, 'visible', 'off');
 set(handles.overallScore, 'visible', 'off');
-set(handles.nextSpace, 'visible', 'off');
+set(handles.doneButton, 'visible', 'off');
 
 
 function recall_Callback(hObject, eventdata, handles)
@@ -434,7 +425,7 @@ function recall_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of recall as text
 %        str2double(get(hObject,'String')) returns contents of recall as a double
-global userTyped
+global userTyped;
 userTyped = get(hObject, 'String');
 
 % --- Executes during object creation, after setting all properties.
@@ -499,3 +490,12 @@ switch responseType
 end
 
 percentRight = num2str(round((totAns/totalAp) * 100));
+
+
+% --- Executes on button press in doneButton.
+function doneButton_Callback(hObject, eventdata, handles)
+% hObject    handle to doneButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+logUserResponse();
+goToBeginningOfTrial(handles);
