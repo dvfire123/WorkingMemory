@@ -1,4 +1,4 @@
-function recallStim = getRecallStim(isCons, NR)
+function [recallStim, recallStimActual] = getRecallStim(isCons, NR)
     %Takes in number of recall items and whether they
     %are consonants or not (digits), generates the appropriate
     %list of recall items
@@ -23,6 +23,7 @@ function recallStim = getRecallStim(isCons, NR)
         end
         
         recallStim = strjoin(stimCell, ' ');
+        recallStimActual = strjoin(stimCell, '');
         return;
     end
     
@@ -43,5 +44,5 @@ function recallStim = getRecallStim(isCons, NR)
     end
 
     recallStim = strjoin(stimCell, ' ');
-    
+    recallStimActual = strjoin(stimCell, '');
 end

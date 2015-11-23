@@ -112,18 +112,18 @@ if ~exist(resFile, 'file')
 end
 
 fid = fopen(resFile, 'at+');    %appending results
-fprintf(fid, 'Name %s %s\n', fn, ln);
-fprintf(fid, '%s\n\n', datestr(now));    %timestamp
-fprintf(fid, 'NR--Number of recall items %d\n', NR);
+fprintf(fid, 'Name # %s %s\n', fn, ln);
+fprintf(fid, 'Date and Time # %s\n\n', datestr(now));    %timestamp
+fprintf(fid, 'NR--Number of recall items # %d\n', NR);
 typeRecall = 'Consonants';
 if isCons == 0
    typeRecall = 'Digits'; 
 end
-fprintf(fid, 'Type of recall item %s\n', typeRecall);
-fprintf(fid, 'DR--Time of which recall stimulus is displayed (s) %f\n', DR);
-fprintf(fid, 'TR--Total time of evaluating all arithmetic problems (s) %f\n', TR);
-fprintf(fid, 'DA--Maximum time of which each arithmetic problem is displayed (s) %f\n', DA);
-fprintf(fid, 'NT--Number of Trials %d\n', NT);
+fprintf(fid, 'Type of recall item # %s\n', typeRecall);
+fprintf(fid, 'DR--Time of which recall stimulus is displayed (s) # %f\n', DR);
+fprintf(fid, 'TR--Total time of evaluating all arithmetic problems (s) # %f\n', TR);
+fprintf(fid, 'DA--Maximum time of which each arithmetic problem is displayed (s) # %f\n', DA);
+fprintf(fid, 'NT--Number of Trials # %d\n', NT);
 fprintf(fid, '\nTrial Results:\n');
 fclose(fid);
 
@@ -161,12 +161,12 @@ guidata(hObject, handles);
 %%--Timer Callbacks--%%
 %DR start
 function showRecallStim(~, ~, handles)
-global recallStim;
+global recallStim rsActual;
 global isCons NR;
 global DR DRtimeleft;
 
 DRtimeleft = DR;
-recallStim = getRecallStim(isCons, NR);
+[recallStim, rsActual] = getRecallStim(isCons, NR);
 set(handles.recallStimLabel, 'string', recallStim);
 set(handles.recallStimLabel, 'visible', 'on');
 
@@ -292,7 +292,7 @@ end
 
 %%--helpers--%%
 function logUserResponse(handles)
-global resFile NT trialCount recallStim;
+global resFile NT trialCount rsActual;
 global corrCount percentRight totalAp TR;
 fid = fopen(resFile, 'at+');
 if fid == -1
@@ -308,20 +308,20 @@ end
 
 userTyped = get(handles.recall, 'string');
 
-fprintf(fid, 'Trial %d out of %d\n\n', trialCount, NT);
+fprintf(fid, 'Trial # %d # out of # %d\n\n', trialCount, NT);
 fprintf(fid, 'Recall stimulus results:\n');
-fprintf(fid, 'Actual %s\n', recallStim);
-fprintf(fid, 'User typed %s\n', userTyped);
+fprintf(fid, 'Actual # %s\n', rsActual);
+fprintf(fid, 'User typed # %s\n', userTyped);
 fprintf(fid, 'Arithmetic Problem Results:\n');
-fprintf(fid, 'Number of "Correct" responses when actual answer is "Correct" %d\n', corrCount(1));
-fprintf(fid, 'Number of "Incorrect" responses when actual answer is "Correct" %d\n', corrCount(2));
-fprintf(fid, 'Number of "No response" responses when actual answer is "Correct" %d\n', corrCount(3));
-fprintf(fid, 'Number of "Correct" responses when actual answer is "Incorrect" %d\n', corrCount(4));
-fprintf(fid, 'Number of "Incorrect" responses when actual answer is "Incorrect" %d\n', corrCount(5));
-fprintf(fid, 'Number of "No response" responses when actual answer is "Incorrect" %d\n', corrCount(6));
-fprintf(fid, 'Percentage of responses correctly answered %s percent\n', percentRight);
-fprintf(fid, 'Total number of arithmetic problems seen %d\n', totalAp);
-fprintf(fid, 'Average time spent per arithmetic problem (s) %s\n', avgTimePerAp); 
+fprintf(fid, 'Number of "Correct" responses when actual answer is "Correct" # %d\n', corrCount(1));
+fprintf(fid, 'Number of "Incorrect" responses when actual answer is "Correct" # %d\n', corrCount(2));
+fprintf(fid, 'Number of "No response" responses when actual answer is "Correct" # %d\n', corrCount(3));
+fprintf(fid, 'Number of "Correct" responses when actual answer is "Incorrect" # %d\n', corrCount(4));
+fprintf(fid, 'Number of "Incorrect" responses when actual answer is "Incorrect" # %d\n', corrCount(5));
+fprintf(fid, 'Number of "No response" responses when actual answer is "Incorrect" # %d\n', corrCount(6));
+fprintf(fid, 'Percentage of responses correctly answered # %s # percent\n', percentRight);
+fprintf(fid, 'Total number of arithmetic problems seen # %d\n', totalAp);
+fprintf(fid, 'Average time spent per arithmetic problem (s) # %s\n', avgTimePerAp); 
 fprintf(fid, '-----------\n\n');
 fclose(fid);
 
