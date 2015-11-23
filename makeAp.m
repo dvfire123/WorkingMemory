@@ -11,7 +11,10 @@ function [res, minuend, answer] = makeAp()
     subtrahend = 3;
     if wrong == 1
         res = 0;
-        offset = floor(5*rand)*2 + 1;
+        offset = floor(5*rand)*2 + 1;   %1 5 7 9
+        while offset == 3
+            offset = floor(5*rand)*2 + 1;
+        end
         if rand < 0.5
             offset = -offset;
         end
